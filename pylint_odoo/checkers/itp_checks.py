@@ -11,8 +11,8 @@ ITP_CHECK_PREFIX_ID = 77
 ITP_ODOO_MSGS = {
     # C->convention R->refactor W->warning E->error F->fatal
     'E%d01' % ITP_CHECK_PREFIX_ID: (
-        'Necessary manifest field "%s" got wrong value "%s"',
-        'skipped-field',
+        'Placeholder "%s" is not updated',
+        'presence-template-placeholder',
         settings.DESC_DFLT
     ),
 }
