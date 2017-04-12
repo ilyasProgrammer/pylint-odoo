@@ -38,7 +38,6 @@ ITP_ODOO_MSGS = {
 }
 TEMPLATE_RE = '{[_ a-zA-Z0-9]*}'
 TEMPLATE_FILES = ('README.rst', 'doc/index.rst', 'doc/changelog.rst')
-MANIFEST_FILES = ('__openerp__.py', '__manifest__.py')
 
 
 class ITPModuleChecker(misc.WrapperModuleChecker):
@@ -90,14 +89,11 @@ class ITPModuleChecker(misc.WrapperModuleChecker):
         return os.path.isfile(os.path.join(self.module_path, 'doc/changelog.rst'))
 
     def _check_absent_manifest(self):
-        self.msg_args = []
-        self.got_manifest = False
-        for manifest_file in MANIFEST_FILES:
-            if os.path.isfile(os.path.join(self.module_path, manifest_file)):
-                self.got_manifest = True
-                return True
-        self.msg_args.append('Module has no manifest file.')
-        return False
+        # TODO need to be moved to NoModuleChecker
+        if not self.manifest_file:
+            self.msg_args.append('Module has no manifest file.')
+            return False
+        return True
 
     def _check_rst_template_field(self):
         rst_files = self.filter_files_ext('rst')
