@@ -11,7 +11,7 @@ from .. import misc, settings
 ITP_ODOO_MSGS = {
     # C->convention R->refactor W->warning E->error F->fatal
     'E%d99' % settings.BASE_OMODULE_ID: (
-        'Necessary manifest field "%s" got wrong value "%s"',
+        'Placeholder "%s" is not updated',
         'manifest-template-field',
         settings.DESC_DFLT
     ),
@@ -26,13 +26,19 @@ ITP_ODOO_MSGS = {
         settings.DESC_DFLT
     ),
     'E%d96' % settings.BASE_OMODULE_ID: (
-        'File: %s - Template field "%s" is not filled',
+        'Module has no manifest file',
+        'absent-manifest',
+        settings.DESC_DFLT
+    ),
+    'E%d95' % settings.BASE_OMODULE_ID: (
+        'File: %s - Template placeholder "%s" is not updated',
         'rst-template-field',
         settings.DESC_DFLT
     ),
 }
 TEMPLATE_RE = '{[_ a-zA-Z0-9]*}'
 TEMPLATE_FILES = ('README.rst', 'doc/index.rst', 'doc/changelog.rst')
+MANIFEST_FILES = ('__openerp__.py', '__manifest__.py')
 
 
 class ITPModuleChecker(misc.WrapperModuleChecker):
@@ -56,7 +62,7 @@ class ITPModuleChecker(misc.WrapperModuleChecker):
             if isinstance(v, types.StringTypes):
                 match = re.match(TEMPLATE_RE, v)
                 if match:
-                    self.add_message('manifest-template-field', node=node, args=(k, v))
+                    self.add_message('manifest-template-field', node=node, args=v)
 
     def open(self):
         """Define variables to use cache"""
@@ -82,6 +88,16 @@ class ITPModuleChecker(misc.WrapperModuleChecker):
 
     def _check_absent_changelog(self):
         return os.path.isfile(os.path.join(self.module_path, 'doc/changelog.rst'))
+
+    def _check_absent_manifest(self):
+        self.msg_args = []
+        self.got_manifest = False
+        for manifest_file in MANIFEST_FILES:
+            if os.path.isfile(os.path.join(self.module_path, manifest_file)):
+                self.got_manifest = True
+                return True
+        self.msg_args.append('Module has no manifest file.')
+        return False
 
     def _check_rst_template_field(self):
         rst_files = self.filter_files_ext('rst')
