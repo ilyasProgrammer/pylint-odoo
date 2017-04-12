@@ -1,3 +1,4 @@
+import re
 import ast
 import os
 import types
@@ -32,5 +33,6 @@ class ITPModuleChecker(BaseChecker):
         # Check all template fields filled
         for k, v in manifest_dict.items():
             if isinstance(v, types.StringTypes):
-                if '{' in v or '}' in v:
+                match = re.match('{[_ a-zA-Z0-9]*}', v)
+                if match:
                     self.add_message('skipped-field', node=node, args=(k, v))
