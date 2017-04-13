@@ -16,12 +16,12 @@ ITP_ODOO_MSGS = {
         settings.DESC_DFLT
     ),
     'E%d98' % settings.BASE_OMODULE_ID: (
-        'File doc/index.rst is absent in module',
+        'File: doc/index.rst is absent in module',
         'absent-doc',
         settings.DESC_DFLT
     ),
     'E%d97' % settings.BASE_OMODULE_ID: (
-        'File doc/changelog.rst is absent in module',
+        'File: doc/changelog.rst is absent in module',
         'absent-changelog',
         settings.DESC_DFLT
     ),
@@ -31,7 +31,7 @@ ITP_ODOO_MSGS = {
         settings.DESC_DFLT
     ),
     'E%d95' % settings.BASE_OMODULE_ID: (
-        'File static/description/icon.png is absent in module',
+        'File: static/description/icon.png is absent in module',
         'absent-icon',
         settings.DESC_DFLT
     ),
@@ -123,13 +123,11 @@ class ITPModuleChecker(misc.WrapperModuleChecker):
         self.msg_args = []
         xml_ids = []
         for xml_file in xml_files:
-            f = io.open(os.path.join(self.module_path, xml_file), "rb")
-            content = f.read()
-            f.close()
-            match = re.findall('<record.*id[ ]*=[\'|\"]([^\'\"]*)', content)
+            result = self.parse_xml(os.path.join(self.module_path, xml_file))
+            match = result.xpath('data/record')
             if len(match):
                 for rec in match:
-                    xml_ids.append((xml_file, rec))
+                    xml_ids.append((xml_file, rec.attrib['id']))
         ln = len(xml_ids)
         for i in range(ln):
             for j in range(i+1, ln):
