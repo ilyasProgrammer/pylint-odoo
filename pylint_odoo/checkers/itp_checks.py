@@ -26,11 +26,6 @@ ITP_ODOO_MSGS = {
         settings.DESC_DFLT
     ),
     'E%d96' % settings.BASE_OMODULE_ID: (
-        'Module has no manifest file',
-        'absent-manifest',
-        settings.DESC_DFLT
-    ),
-    'E%d95' % settings.BASE_OMODULE_ID: (
         'File: %s - Template placeholder "%s" is not updated',
         'rst-template-field',
         settings.DESC_DFLT
@@ -50,6 +45,7 @@ class ITPModuleChecker(misc.WrapperModuleChecker):
     def visit_module(self, node):
         self.wrapper_visit_module(node)
 
+    @utils.check_messages('manifest-template-field')
     def visit_dict(self, node):
         if not os.path.basename(self.linter.current_file) in settings.MANIFEST_FILES \
                 or not isinstance(node.parent, astroid.Discard):
@@ -82,19 +78,15 @@ class ITPModuleChecker(misc.WrapperModuleChecker):
                              node=nodes[0],
                              args=(class_dup_name, ', '.join(path_nodes)))
 
+    @utils.check_messages('absent-doc')
     def _check_absent_doc(self):
         return os.path.isfile(os.path.join(self.module_path, 'doc/index.rst'))
 
+    @utils.check_messages('absent-changelog')
     def _check_absent_changelog(self):
         return os.path.isfile(os.path.join(self.module_path, 'doc/changelog.rst'))
 
-    def _check_absent_manifest(self):
-        # TODO need to be moved to NoModuleChecker
-        if not self.manifest_file:
-            self.msg_args.append('Module has no manifest file.')
-            return False
-        return True
-
+    @utils.check_messages('rst-template-field')
     def _check_rst_template_field(self):
         rst_files = self.filter_files_ext('rst')
         self.msg_args = []
