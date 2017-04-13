@@ -37,8 +37,8 @@ TEMPLATE_FILES = ('README.rst', 'doc/index.rst', 'doc/changelog.rst')
 
 class ITPModuleChecker(misc.WrapperModuleChecker):
     __implements__ = IAstroidChecker
-
-    name = 'itplynt'
+    name = settings.CFG_SECTION
+    # name = 'itplynt'
     msgs = ITP_ODOO_MSGS
 
     @utils.check_messages(*(ITP_ODOO_MSGS.keys()))
